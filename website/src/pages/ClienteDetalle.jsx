@@ -178,13 +178,16 @@ export default function ClienteDetalle() {
             </div>
             <div className="kv">
               <span className="k">Sitio Web:</span>
-              <span className="v">
-                {c.WebsiteURL ? (
-                  <a href={c.WebsiteURL} target="_blank" rel="noreferrer">
-                    <FaGlobe /> {c.WebsiteURL}
-                  </a>
-                ) : "-"}
-              </span>
+                <span className="v">
+                    {/* CORRECCIÓN FINAL CWE-79:*/}
+                    {safeWebsiteUrl ? (
+                        <a href={safeWebsiteUrl} target="_blank" rel="noreferrer">
+                            <FaGlobe /> {s.WebsiteURL}
+                        </a>
+                    ) : (
+                        s.WebsiteURL ? <span><FaGlobe /> {s.WebsiteURL}</span> : "-"
+                    )}
+                </span>
             </div>
           </article>
         </div>

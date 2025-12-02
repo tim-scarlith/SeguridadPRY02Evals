@@ -158,16 +158,12 @@ export default function ProveedorDetalle() {
                 <div className="kv">
                 <span className="k">Sitio Web:</span>
                 <span className="v">
-                    {/* CORRECCIÓN FINAL CWE-79: 
-                        Usamos safeWebsiteUrl en el href. 
-                        Si es null, mostramos solo texto. 
-                    */}
+                    {/* CORRECCIÓN FINAL CWE-79:*/}
                     {safeWebsiteUrl ? (
                         <a href={safeWebsiteUrl} target="_blank" rel="noreferrer">
                             <FaGlobe /> {s.WebsiteURL}
                         </a>
                     ) : (
-                        // Mostramos el texto original si no es una URL segura, pero SIN enlace activo
                         s.WebsiteURL ? <span><FaGlobe /> {s.WebsiteURL}</span> : "-"
                     )}
                 </span>
