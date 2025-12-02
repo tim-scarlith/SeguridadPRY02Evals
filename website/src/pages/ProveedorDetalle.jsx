@@ -158,17 +158,18 @@ export default function ProveedorDetalle() {
                 <div className="kv">
                 <span className="k">Sitio Web:</span>
                 <span className="v">
-                    {/* CORRECCIÓN DE SEGURIDAD CWE-79: Validar Protocolo */}
-                    {s.WebsiteURL ? (
-                        isValidWebUrl(s.WebsiteURL) ? (
-                            <a href={s.WebsiteURL} target="_blank" rel="noreferrer">
-                                <FaGlobe /> {s.WebsiteURL}
-                            </a>
-                        ) : (
-                            // Si la URL es maliciosa (ej: javascript:alert), se muestra solo texto
-                            <span><FaGlobe /> {s.WebsiteURL} (URL Inválida)</span>
-                        )
-                    ) : "-"}
+                    {/* CORRECCIÓN FINAL CWE-79: 
+                        Usamos safeWebsiteUrl en el href. 
+                        Si es null, mostramos solo texto. 
+                    */}
+                    {safeWebsiteUrl ? (
+                        <a href={safeWebsiteUrl} target="_blank" rel="noreferrer">
+                            <FaGlobe /> {s.WebsiteURL}
+                        </a>
+                    ) : (
+                        // Mostramos el texto original si no es una URL segura, pero SIN enlace activo
+                        s.WebsiteURL ? <span><FaGlobe /> {s.WebsiteURL}</span> : "-"
+                    )}
                 </span>
                 </div>
             </article>
