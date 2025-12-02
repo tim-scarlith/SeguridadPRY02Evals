@@ -5,32 +5,6 @@ import "../css/Clientes.css";
 import "../css/ClienteDetalle.css"; 
 import { FaArrowLeft, FaPhoneAlt, FaGlobe, FaMapMarkerAlt, FaTruck, FaIdCard, FaUniversity } from "react-icons/fa";
 
-// --- SEGURIDAD: Funciones de validación ---
-
-// 1. Validar URL del Sitio Web (Evita javascript:alert(...))
-const isValidWebUrl = (urlString) => {
-  if (!urlString) return false;
-  try {
-    const url = new URL(urlString);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch (e) {
-    return false;
-  }
-};
-
-// 2. Validar URL del Mapa (Evita inyección en iframe)
-const isValidMapUrl = (urlString) => {
-  if (!urlString) return false;
-  try {
-    const url = new URL(urlString);
-    if (url.protocol !== "https:") return false;
-    const allowedDomains = ["googleusercontent.com", "www.google.com", "maps.google.com"];
-    return allowedDomains.some(domain => url.hostname.endsWith(domain));
-  } catch (e) {
-    return false;
-  }
-};
-
 export default function ProveedorDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,11 +43,9 @@ export default function ProveedorDetalle() {
   }
 
   const s = data.general;
-  
-  // Corrección de sintaxis: se agregó '$' antes de {s.Lat} y se cambió a https
   const mapUrl =
     s.Lat != null && s.Lng != null
-      ? `https://googleusercontent.com/maps.google.com/?q=${s.Lat},${s.Lng}&z=14&output=embed`
+      ? `https://maps.google.com/maps?q=${s.Lat},${s.Lng}&z=14&output=embed`
       : null;
 
   return (
@@ -94,15 +66,8 @@ export default function ProveedorDetalle() {
                 <div className="card-header">
                 <FaMapMarkerAlt /> Ubicación
                 </div>
-                {/* Validación de seguridad para iframe */}
-                {mapUrl && isValidMapUrl(mapUrl) ? (
-                <iframe 
-                    title="mapa" 
-                    src={mapUrl} 
-                    loading="lazy" 
-                    sandbox="allow-scripts allow-same-origin allow-popups"
-                    referrerPolicy="no-referrer"
-                />
+                {mapUrl ? (
+                <iframe title="mapa" src={mapUrl} loading="lazy" />
                 ) : (
                 <div className="map-placeholder">Sin ubicación</div>
                 )}
@@ -118,7 +83,7 @@ export default function ProveedorDetalle() {
                 <div className="kv"><span className="k">Días de pago:</span><span className="v">{s.PaymentDays ?? "-"}</span></div>
             </article>
 
-            {/* DATOS BANCARIOS */}
+            {/* DATOS BANCARIOS (al lado de Info General) */}
             <article className="card card-block area-bank">
                 <div className="card-header"><FaUniversity /> Datos Bancarios</div>
                 <div className="kv"><span className="k">Nombre en cuenta:</span><span className="v">{s.BankName ?? "-"}</span></div>
@@ -148,7 +113,7 @@ export default function ProveedorDetalle() {
                 <div className="kv alt"><span className="k">Código Postal:</span><span className="v">{s.CodigoPostal ?? "-"}</span></div>
             </article>
 
-            {/* CONTACTOS & WEB (SECCIÓN CORREGIDA) */}
+            {/* CONTACTOS & WEB */}
             <article className="card card-block area-contacts">
                 <div className="card-header"><FaIdCard /> Contactos</div>
                 <div className="kv"><span className="k">Primario:</span><span className="v">{s.PrimaryContactName ?? "-"}</span></div>
@@ -158,16 +123,10 @@ export default function ProveedorDetalle() {
                 <div className="kv">
                 <span className="k">Sitio Web:</span>
                 <span className="v">
-                    {/* CORRECCIÓN  CWE-79 */}
                     {s.WebsiteURL ? (
-                        isValidWebUrl(s.WebsiteURL) ? (
-                            <a href={s.WebsiteURL} target="_blank" rel="noreferrer">
-                                <FaGlobe /> {s.WebsiteURL}
-                            </a>
-                        ) : (
-                            
-                            <span><FaGlobe /> {s.WebsiteURL} (URL Inválida)</span>
-                        )
+                    <a href={s.WebsiteURL} target="_blank" rel="noreferrer">
+                        <FaGlobe /> {s.WebsiteURL}
+                    </a>
                     ) : "-"}
                 </span>
                 </div>
