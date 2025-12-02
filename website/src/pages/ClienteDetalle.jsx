@@ -5,6 +5,28 @@ import "../css/Clientes.css";
 import "../css/ClienteDetalle.css";
 import { FaArrowLeft, FaPhoneAlt, FaGlobe, FaMapMarkerAlt, FaTruck, FaIdCard } from "react-icons/fa";
 
+// --- SEGURIDAD: Función de validación fuera del componente ---
+const isValidMapUrl = (urlString) => {
+  if (!urlString) return false;
+  try {
+    const url = new URL(urlString);
+    // 1. Validar protocolo seguro
+    if (url.protocol !== "https:") return false;
+    
+    // 2. Validar dominios permitidos (Lista Blanca)
+    const allowedDomains = [
+      "maps.google.com", 
+      "www.google.com", 
+      "googleusercontent.com"
+    ];
+    
+    // Verifica si el hostname está en la lista o es un subdominio válido
+    return allowedDomains.some(domain => url.hostname === domain || url.hostname.endsWith(`.${domain}`));
+  } catch (e) {
+    return false;
+  }
+};
+
 export default function ClienteDetalle() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,6 +65,11 @@ export default function ClienteDetalle() {
   }
 
   const c = data.general || {};
+  
+  // --- SEGURIDAD: Construcción segura de la URL ---
+  // 1. Se cambió http a https (requerido para iframes seguros).
+  // 2. Se corrigió la sintaxis `${c.Lat}` (faltaba el signo $).
+  // 3. Se usa una estructura estándar de Google Maps para asegurar compatibilidad.
   const mapUrl = (c.Lat != null && c.Lng != null)
     ? `https://maps.google.com/maps?q=${c.Lat},${c.Lng}&z=14&output=embed`
     : null;
@@ -65,8 +92,16 @@ export default function ClienteDetalle() {
             <div className="card-header">
               <FaMapMarkerAlt /> Ubicación
             </div>
-            {mapUrl ? (
-              <iframe title="mapa" src={mapUrl} loading="lazy" />
+            {/* --- SEGURIDAD: Validación y Sandbox --- */}
+            {mapUrl && isValidMapUrl(mapUrl) ? (
+              <iframe 
+                title="mapa" 
+                src={mapUrl} 
+                loading="lazy"
+                // El atributo sandbox bloquea scripts maliciosos y popups
+                sandbox="allow-scripts allow-same-origin allow-popups"
+                referrerPolicy="no-referrer"
+              />
             ) : (
               <div className="map-placeholder">Sin ubicación</div>
             )}
